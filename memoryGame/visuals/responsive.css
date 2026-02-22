@@ -1,0 +1,212 @@
+/* Responsive Design */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .welcome-screen {
+        padding: 20px;
+    }
+
+    .welcome-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .main-menu-screen,
+    .lobby-screen {
+        padding: 20px;
+    }
+
+    .menu-content h1,
+    .lobby-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .room-code {
+        font-size: 2rem;
+        letter-spacing: 0.2em;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .lobby-controls {
+        flex-direction: column;
+    }
+
+    .menu-options .btn-large {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+
+    .instructions {
+        padding: 12px;
+    }
+
+    .instructions summary {
+        font-size: 1rem;
+    }
+
+    .instructions ul {
+        font-size: 0.95rem;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .stats {
+        font-size: 1rem;
+        gap: 20px;
+        padding: 10px 20px;
+    }
+
+    .current-player-section {
+        padding: 10px 20px;
+    }
+
+    .current-player-name {
+        font-size: 1.2rem;
+    }
+
+    .turn-timer {
+        font-size: 1rem;
+    }
+
+    .timer-progress-bar {
+        height: 6px;
+    }
+
+    .players-scores {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .player-score-card {
+        padding: 10px;
+    }
+
+    .player-score-card .player-name {
+        font-size: 0.9rem;
+        padding: 4px 8px;
+    }
+
+    .player-score-card .player-score {
+        font-size: 1.2rem;
+    }
+
+    .game-board {
+        gap: 8px;
+    }
+
+    .card-front,
+    .card-back {
+        font-size: 1.8rem;
+    }
+
+    .card-front-text {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+        margin: 3px;
+    }
+
+    .modal-content {
+        padding: 25px;
+        max-width: 90%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .toast {
+        padding: 20px 30px;
+        font-size: 1.5rem;
+        min-width: 250px;
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .controls .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .welcome-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    .game-board {
+        gap: 6px;
+    }
+
+    .card-front,
+    .card-back {
+        font-size: 1.5rem;
+    }
+
+    .current-player-name {
+        font-size: 1rem;
+    }
+
+    .turn-timer {
+        font-size: 0.9rem;
+    }
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .card {
+        transition: none;
+    }
+    
+    .toast {
+        animation: none;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+    }
+    
+    .controls,
+    .toast {
+        display: none !important;
+    }
+}

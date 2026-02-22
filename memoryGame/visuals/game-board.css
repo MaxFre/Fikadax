@@ -1,0 +1,245 @@
+/* Game Container and Header */
+.container {
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-info {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.current-player-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.current-player-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.current-player-name {
+    color: #667eea;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.turn-timer {
+    color: #764ba2;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.turn-timer.warning {
+    color: #ff4444;
+    animation: pulse 0.5s infinite;
+}
+
+.timer-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.timer-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease, background 0.3s ease;
+    border-radius: 10px;
+}
+
+.timer-progress-fill.warning {
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+}
+
+/* Player Scores */
+.players-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.player-score-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: slideInCard 0.5s ease backwards;
+}
+
+.player-score-card.active {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    transform: scale(1.05);
+}
+
+.player-score-card .player-name {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: 3px solid transparent;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.player-score-card.active .player-name {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.player-score-card .player-score {
+    color: #764ba2;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 30px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.moves span:first-child,
+.timer span:first-child {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Game Board */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+    perspective: 1000px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Cards */
+.card {
+    aspect-ratio: 1;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.6s, box-shadow 0.3s;
+    will-change: transform;
+    animation: cardAppear 0.5s ease backwards;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card:focus {
+    outline: 3px solid #667eea;
+    outline-offset: 4px;
+}
+
+.card:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 4px;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card.flipped:hover {
+    transform: rotateY(180deg) scale(1.02);
+}
+
+.card.matched {
+    animation: matchFound 0.6s forwards;
+    cursor: default;
+    pointer-events: none;
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover .card-front,
+.card:hover .card-back {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-front {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.card-front-text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-style: italic;
+    transform: rotate(-45deg);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    user-select: none;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    transform: rotateY(180deg);
+    border: 3px solid #667eea;
+}
+
+/* Controls */
+.controls {
+    text-align: center;
+}

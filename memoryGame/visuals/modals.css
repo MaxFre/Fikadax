@@ -1,0 +1,107 @@
+/* Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.4s ease;
+}
+
+.modal-content h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.modal-content p {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+#winner-announcement {
+    font-size: 1.3rem;
+    color: #764ba2;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.final-stats {
+    margin: 20px 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.final-stats h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.final-stats p {
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.final-stats p:hover {
+    background: #f8f9fa;
+}
+
+.final-stats span {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.final-stats .winner-highlight {
+    color: #28a745;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 2px solid #28a745;
+    font-weight: bold;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 80px;
+    border-radius: 25px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    text-align: center;
+    min-width: 400px;
+    opacity: 0;
+}
+
+.toast.show {
+    animation: toastPopup 2s ease-in-out;
+}

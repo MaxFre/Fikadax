@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="visuals/base.css">
+    <link rel="stylesheet" href="visuals/screens.css">
+    <link rel="stylesheet" href="visuals/game-board.css">
+    <link rel="stylesheet" href="visuals/modals.css">
+    <link rel="stylesheet" href="visuals/animations.css">
+    <link rel="stylesheet" href="visuals/responsive.css">
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <!-- Main Menu Screen -->
+    <div class="main-menu-screen" id="main-menu-screen">
+        <div class="menu-content">
+            <h1>🎮 Memory Card Game 🎮</h1>
+            <p class="menu-subtitle">Test your memory and compete with friends!</p>
+            
+            <div class="menu-options">
+                <button id="local-game-btn" class="btn btn-large btn-primary" aria-label="Play local game">
+                    🏠 Local Game
+                </button>
+                <button id="host-game-btn" class="btn btn-large btn-secondary" aria-label="Host online game">
+                    🌐 Host Online Game
+                </button>
+                <button id="join-game-btn" class="btn btn-large btn-secondary" aria-label="Join online game">
+                    🔗 Join Online Game
+                </button>
+                <button id="main-menu-home-btn" class="btn btn-large btn-secondary" aria-label="Back to game hub" style="margin-top: 20px;">
+                    🏡 Back to Game Hub
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen hidden" id="welcome-screen">
+        <div class="welcome-content">
+            <h1>🎮 Game Setup 🎮</h1>
+            <p class="welcome-subtitle">Configure your game settings</p>
+            
+            <!-- How to Play Section -->
+            <details class="instructions" open>
+                <summary>📖 How to Play</summary>
+                <ul>
+                    <li>Click cards to reveal their symbols</li>
+                    <li>Match pairs to score points</li>
+                    <li>Each match earns another turn</li>
+                    <li>Complete all pairs before time runs out!</li>
+                </ul>
+            </details>
+            
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="difficulty">Difficulty Level:</label>
+                    <select id="difficulty" aria-label="Select difficulty level">
+                        <option value="easy">Easy (4x3 - 6 pairs)</option>
+                        <option value="medium" selected>Medium (6x3 - 9 pairs)</option>
+                        <option value="hard">Hard (8x3 - 12 pairs)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="local-player-count-group">
+                    <label for="player-count">Number of Players:</label>
+                    <input type="number" id="player-count" min="1" max="8" value="1" aria-label="Number of players">
+                </div>
+                
+                <div class="form-group">
+                    <label for="turn-time">Time per Turn (seconds):</label>
+                    <input type="number" id="turn-time" min="10" max="300" value="30" step="5" aria-label="Time per turn in seconds">
+                </div>
+                
+                <div id="player-names-section" class="hidden">
+                    <h3>Enter Player Names:</h3>
+                    <div id="player-names-inputs"></div>
+                </div>
+                
+                <button id="start-game-btn" class="btn btn-large" aria-label="Start the game">Start Game</button>
+                <button id="back-to-main-menu-btn" class="btn btn-secondary" aria-label="Back to main menu">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Game Screen -->
+    <div class="welcome-screen hidden" id="join-game-screen">
+        <div class="welcome-content">
+            <h1>🔗 Join Online Game</h1>
+            <p class="welcome-subtitle">Enter the room code to join</p>
+            
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="player-name-join">Your Name:</label>
+                    <input type="text" id="player-name-join" placeholder="Enter your name" value="Player" aria-label="Your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="room-code-input">Room Code:</label>
+                    <input type="text" id="room-code-input" placeholder="Enter 6-digit code" maxlength="6" aria-label="Room code" style="text-transform: uppercase; text-align: center; font-size: 1.5rem; letter-spacing: 0.2em;">
+                </div>
+                
+                <div id="join-status" class="status-message hidden"></div>
+                
+                <button id="join-room-btn" class="btn btn-large" aria-label="Join room">Join Room</button>
+                <button id="back-to-main-from-join-btn" class="btn btn-secondary" aria-label="Back to main menu">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div class="lobby-screen hidden" id="lobby-screen">
+        <div class="lobby-content">
+            <h1>🎮 Game Lobby</h1>
+            <p class="lobby-subtitle" id="lobby-subtitle">Waiting for players to join...</p>
+            
+            <div class="room-code-display">
+                <div class="room-code-label">Room Code:</div>
+                <div class="room-code" id="room-code-display">------</div>
+                <button id="copy-code-btn" class="btn btn-small" aria-label="Copy room code">📋 Copy Code</button>
+            </div>
+            
+            <div class="lobby-settings" id="host-name-section">
+                <h3>Your Name</h3>
+                <div class="setting-item">
+                    <input type="text" id="player-name-host" placeholder="Enter your name" value="" class="lobby-input" style="width: 100%; max-width: 300px;" aria-label="Your name">
+                </div>
+            </div>
+            
+            <div class="lobby-settings">
+                <h3>Game Settings</h3>
+                <div class="setting-item">
+                    <span class="setting-label">Difficulty:</span>
+                    <select id="lobby-difficulty" class="lobby-select">
+                        <option value="easy">Easy (4x3 - 6 pairs)</option>
+                        <option value="medium" selected>Medium (6x3 - 9 pairs)</option>
+                        <option value="hard">Hard (8x3 - 12 pairs)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Turn Time:</span>
+                    <input type="number" id="lobby-turn-time" min="10" max="300" value="30" step="5" class="lobby-input"> seconds
+                </div>
+            </div>
+            
+            <div class="players-lobby">
+                <h3>Players (<span id="player-count-display">0</span>/8)</h3>
+                <div id="lobby-players-list" class="lobby-players-list">
+                    <!-- Players will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="lobby-controls">
+                <button id="start-online-game-btn" class="btn btn-large btn-primary" aria-label="Start game" style="display: none;">Start Game</button>
+                <button id="leave-lobby-btn" class="btn btn-secondary" aria-label="Leave lobby">Leave Lobby</button>
+            </div>
+            
+            <div id="lobby-status" class="status-message"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="container hidden" id="game-screen">
+        <header>
+            <h1>Memory Card Game</h1>
+            <div class="game-info">
+                <div class="current-player-section">
+                    <div class="current-player-label">Current Player:</div>
+                    <div class="current-player-name" id="current-player-name">Player 1</div>
+                    <div class="timer-container">
+                        <div class="turn-timer" id="turn-timer" role="timer" aria-live="polite">30s</div>
+                        <div class="timer-progress-bar">
+                            <div class="timer-progress-fill" id="timer-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="players-scores" id="players-scores">
+            <!-- Player scores will be generated by JavaScript -->
+        </div>
+
+        <div class="game-board" id="game-board">
+            <!-- Cards will be generated by JavaScript -->
+        </div>
+
+        <div class="controls">
+            <button id="pause-btn" class="btn btn-pause" aria-label="Pause game">⏸️ Pause</button>
+            <button id="restart-btn" class="btn" aria-label="Restart game">🔄 New Game</button>
+            <button id="back-to-menu-btn" class="btn btn-secondary" aria-label="Back to main menu">🏠 Back to Menu</button>
+        </div>
+
+        <!-- Pause Modal -->
+        <div class="modal hidden" id="pause-modal">
+            <div class="modal-content">
+                <h2>⏸️ Game Paused</h2>
+                <p>Take a break! Resume when you're ready.</p>
+                <button id="resume-btn" class="btn btn-large" aria-label="Resume game">▶️ Resume Game</button>
+                <button id="quit-to-menu-btn" class="btn btn-secondary" aria-label="Quit to menu">Quit to Menu</button>
+            </div>
+        </div>
+
+        <!-- Restart Confirmation Modal -->
+        <div class="modal hidden" id="restart-modal">
+            <div class="modal-content">
+                <h2>⚠️ Restart Game?</h2>
+                <p>All progress will be lost. Are you sure?</p>
+                <button id="confirm-restart-btn" class="btn" aria-label="Confirm restart">Yes, Restart</button>
+                <button id="cancel-restart-btn" class="btn btn-secondary" aria-label="Cancel restart">Cancel</button>
+            </div>
+        </div>
+
+        <div class="modal hidden" id="victory-modal" role="dialog" aria-labelledby="victory-title">
+            <div class="modal-content">
+                <h2 id="victory-title">🎉 Game Over! 🎉</h2>
+                <div id="winner-announcement"></div>
+                <div class="final-stats" id="final-stats">
+                    <!-- Final stats will be generated by JavaScript -->
+                </div>
+                <button id="play-again-btn" class="btn" aria-label="Play again">🎮 Play Again</button>
+                <button id="back-to-menu-modal-btn" class="btn btn-secondary" aria-label="Back to menu">🏠 Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Game Logic Scripts -->
+    <script src="gameLogic/game-state.js"></script>
+    <script src="gameLogic/card-logic.js"></script>
+    <script src="gameLogic/timers.js"></script>
+    <script src="gameLogic/ui-controller.js"></script>
+    
+    <!-- Multiplayer Scripts -->
+    <script src="multiplayer/peer-connection.js"></script>
+    <script src="multiplayer/online-game.js"></script>
+    
+    <!-- Event Handlers -->
+    <script src="gameLogic/event-handlers.js"></script>
+</body>
+</html>
