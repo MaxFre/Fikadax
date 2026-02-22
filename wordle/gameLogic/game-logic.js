@@ -8,6 +8,12 @@ function initGame() {
     
     console.log('Target word:', targetWord); // For testing
     
+    // Load streaks on first load
+    if (typeof currentStreak === 'undefined' || currentStreak === null) {
+        loadStreaks();
+    }
+    updateStreakDisplay();
+    
     createBoard();
     createKeyboard();
     
@@ -129,6 +135,12 @@ function submitGuess() {
     // Check if won
     if (guess === targetWord) {
         gameOver = true;
+        currentStreak++;
+        if (currentStreak > bestStreak) {
+            bestStreak = currentStreak;
+        }
+        saveStreaks();
+        updateStreakDisplay();
         setTimeout(() => {
             showGameOver(true);
         }, 2000);
@@ -142,6 +154,9 @@ function submitGuess() {
     // Check if lost
     if (currentRow >= maxGuesses) {
         gameOver = true;
+        currentStreak = 0;
+        saveStreaks();
+        updateStreakDisplay();
         setTimeout(() => {
             showGameOver(false);
         }, 2000);
@@ -227,10 +242,17 @@ function showGameOver(won) {
     
     if (won) {
         title.textContent = '🎉 Congratulations! 🎉';
-        message.textContent = `You guessed the word in ${currentRow + 1} ${currentRow + 1 === 1 ? 'try' : 'tries'}!`;
+        let messageText = `You guessed the word in ${currentRow + 1} ${currentRow + 1 === 1 ? 'try' : 'tries'}!`;
+        if (currentStreak > 1) {
+            messageText += `\n🔥 ${currentStreak} in a row!`;
+        }
+        if (currentStreak === bestStreak && bestStreak > 1) {
+            messageText += ' (New Record!)';
+        }
+        message.textContent = messageText;
     } else {
         title.textContent = '😞 Game Over';
-        message.textContent = `The word was: ${targetWord}`;
+        message.textContent = `The word was: ${targetWord}\n💔 Streak reset to 0`;
     }
     
     modal.classList.remove('hidden');

@@ -5,6 +5,34 @@ let currentTile = 0;
 let gameOver = false;
 let guesses = [];
 
+// Streak tracking
+let currentStreak = 0;
+let bestStreak = 0;
+
+// Load streaks from localStorage
+function loadStreaks() {
+    const saved = localStorage.getItem('wordleStreaks');
+    if (saved) {
+        const data = JSON.parse(saved);
+        currentStreak = data.currentStreak || 0;
+        bestStreak = data.bestStreak || 0;
+    }
+}
+
+// Save streaks to localStorage
+function saveStreaks() {
+    localStorage.setItem('wordleStreaks', JSON.stringify({
+        currentStreak,
+        bestStreak
+    }));
+}
+
+// Update streak display
+function updateStreakDisplay() {
+    document.getElementById('current-streak').textContent = currentStreak;
+    document.getElementById('best-streak').textContent = bestStreak;
+}
+
 // Word list - common 5-letter words
 const wordList = [
     'BREAD', 'CRANE', 'CRISP', 'DANCE', 'DREAM', 'EARTH', 'FLAME', 'GRACE', 'HEART', 'HORSE',
