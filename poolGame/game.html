@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool Table – 8-Ball</title>
+    <link rel="stylesheet" href="visuals/styles.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>🎱 8-Ball Pool</h1>
+        <p>2 players – take turns pocketing your balls, then sink the 8</p>
+    </div>
+
+    <div class="canvas-wrapper">
+        <canvas id="pool-canvas" width="920" height="520"></canvas>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary"   id="restart-btn">🔄 Restart</button>
+        <button class="btn btn-secondary" id="back-btn">🏠 Back to Hub</button>
+    </div>
+
+    <div class="instructions">
+        <strong>How to play:</strong>
+        Click &amp; drag on the canvas to aim and set power – release to shoot.
+        Solids: 1–7 &nbsp;|&nbsp; Stripes: 9–15 &nbsp;|&nbsp;
+        Pocket all your balls then sink the 8-ball to win!
+    </div>
+
+    <script src="gameLogic/game-state.js"></script>
+    <script src="gameLogic/physics.js"></script>
+    <script src="gameLogic/game-logic.js"></script>
+</body>
+</html>
