@@ -1,6 +1,116 @@
 // Current question data
 let currentQuestionData = null;
 
+// Stop timer
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+// Start timer
+function startTimer() {
+    stopTimer();
+    timeRemaining = TOTAL_TIME;
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        updateHintDisplay();
+        
+        if (timeRemaining <= 0) {
+            stopTimer();
+            handleTimeUp();
+        }
+    }, 1000);
+}
+
+// Update timer display
+function updateTimerDisplay() {
+    const timerDisplay = document.getElementById('timer-display');
+    timerDisplay.textContent = `⏱️ ${timeRemaining}`;
+    
+    // Add warning class when time is running low
+    if (timeRemaining <= 5) {
+        timerDisplay.classList.add('warning');
+    } else {
+        timerDisplay.classList.remove('warning');
+    }
+}
+
+// Update hint display - reveal letters progressively from start to 5 seconds
+function updateHintDisplay() {
+    const hintDisplay = document.getElementById('hint-display');
+    
+    // Calculate time elapsed (0 at start, 15 at 5 seconds remaining, 20 at 0 seconds)
+    const timeElapsed = TOTAL_TIME - timeRemaining;
+    
+    // Reveal 0% at start, 50% at 5 seconds remaining (15 seconds elapsed)
+    // Cap at 50% after that
+    const percentageToReveal = Math.min(0.5, (timeElapsed / 15) * 0.5);
+    
+    const answer = currentQuestionData.answer;
+    
+    // Pre-calculate all indices that will eventually be revealed (50% max)
+    const maxLettersToReveal = Math.floor(answer.length * 0.5);
+    const allPotentialIndices = [];
+    
+    // Evenly distribute indices across the word (skip spaces)
+    for (let i = 0; i < maxLettersToReveal; i++) {
+        const index = Math.floor((i * answer.length) / maxLettersToReveal);
+        if (answer[index] !== ' ') {
+            allPotentialIndices.push(index);
+        }
+    }
+    
+    // Determine how many to actually reveal right now
+    const lettersToReveal = Math.floor(answer.length * percentageToReveal);
+    const revealedIndices = new Set(allPotentialIndices.slice(0, lettersToReveal));
+    
+    // Create hint string
+    let hintString = '';
+    for (let i = 0; i < answer.length; i++) {
+        if (answer[i] === ' ') {
+            hintString += '  '; // Two spaces for visibility
+        } else if (revealedIndices.has(i)) {
+            hintString += answer[i];
+        } else {
+            hintString += '_';
+        }
+    }
+    
+    hintDisplay.textContent = hintString;
+}
+
+// Handle time up
+function handleTimeUp() {
+    const feedback = document.getElementById('feedback');
+    const answerInput = document.getElementById('answer-input');
+    
+    feedback.textContent = '⏰ Time\'s up! Answer: ' + currentQuestionData.answer;
+    feedback.className = 'feedback wrong';
+    
+    questionsAnswered++;
+    correctStreak = 0;
+    
+    saveStats();
+    updateStatsDisplay();
+    
+    showMessage('Time ran out!', 'error');
+    
+    // Disable input temporarily
+    answerInput.disabled = true;
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('skip-btn').disabled = true;
+    
+    // Load next question after delay
+    setTimeout(() => {
+        loadNewQuestion();
+    }, 2500);
+}
+
 // Initialize game
 function initGame() {
     loadStats();
@@ -32,12 +142,14 @@ function loadNewQuestion() {
     const typeLabel = document.getElementById('type-label');
     const answerInput = document.getElementById('answer-input');
     const feedback = document.getElementById('feedback');
+    const hintDisplay = document.getElementById('hint-display');
     
     emojiDisplay.textContent = currentQuestionData.emojis;
     typeLabel.textContent = currentQuestionData.type;
     answerInput.value = '';
     feedback.textContent = '';
     feedback.className = 'feedback';
+    hintDisplay.textContent = '';
     
     // Re-enable input and buttons
     answerInput.disabled = false;
@@ -45,6 +157,9 @@ function loadNewQuestion() {
     document.getElementById('skip-btn').disabled = false;
     
     answerInput.focus();
+    
+    // Start the timer
+    startTimer();
 }
 
 // Submit answer
@@ -63,9 +178,11 @@ function submitAnswer() {
     // Check if answer is correct (allow some flexibility)
     const isCorrect = checkAnswer(userAnswer, correctAnswer);
     
-    questionsAnswered++;
-    
     if (isCorrect) {
+        // Stop the timer
+        stopTimer();
+        
+        questionsAnswered++;
         score++;
         correctStreak++;
         if (correctStreak > bestStreak) {
@@ -80,25 +197,27 @@ function submitAnswer() {
         } else {
             showMessage('Great job!', 'success');
         }
+        
+        saveStats();
+        updateStatsDisplay();
+        
+        // Disable input temporarily
+        answerInput.disabled = true;
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('skip-btn').disabled = true;
+        
+        // Load next question after delay
+        setTimeout(() => {
+            loadNewQuestion();
+        }, 2500);
     } else {
-        correctStreak = 0;
-        feedback.textContent = '❌ Wrong! Correct answer: ' + currentQuestionData.answer;
+        // Wrong answer - allow to keep guessing
+        feedback.textContent = '❌ Try again!';
         feedback.className = 'feedback wrong';
-        showMessage('Keep trying!', 'error');
+        answerInput.value = '';
+        answerInput.focus();
+        showMessage('Keep guessing!', 'error');
     }
-    
-    saveStats();
-    updateStatsDisplay();
-    
-    // Disable input temporarily
-    answerInput.disabled = true;
-    document.getElementById('submit-btn').disabled = true;
-    document.getElementById('skip-btn').disabled = true;
-    
-    // Load next question after delay
-    setTimeout(() => {
-        loadNewQuestion();
-    }, 2500);
 }
 
 // Check if answer is correct (with some flexibility)
@@ -138,6 +257,8 @@ function cleanAnswerForComparison(answer) {
 
 // Skip question
 function skipQuestion() {
+    stopTimer();
+    
     const feedback = document.getElementById('feedback');
     feedback.textContent = '⏭️ Skipped! Answer: ' + currentQuestionData.answer;
     feedback.className = 'feedback skipped';
