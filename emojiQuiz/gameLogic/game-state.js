@@ -119,16 +119,20 @@ function getRandomQuestion() {
         usedQuestions = [];
     }
     
-    // Filter out recently used questions
-    const availableQuestions = quizData.filter((_, index) => !usedQuestions.includes(index));
+    // Build array of available indices
+    const availableIndices = [];
+    for (let i = 0; i < quizData.length; i++) {
+        if (!usedQuestions.includes(i)) {
+            availableIndices.push(i);
+        }
+    }
     
-    // Pick random question from available ones
-    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-    const question = availableQuestions[randomIndex];
+    // Pick a completely random index from available ones
+    const randomArrayIndex = Math.floor(Math.random() * availableIndices.length);
+    const selectedIndex = availableIndices[randomArrayIndex];
     
-    // Find original index and add to used list
-    const originalIndex = quizData.indexOf(question);
-    usedQuestions.push(originalIndex);
+    // Mark as used
+    usedQuestions.push(selectedIndex);
     
-    return question;
+    return quizData[selectedIndex];
 }
