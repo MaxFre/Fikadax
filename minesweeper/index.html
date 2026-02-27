@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="visuals/styles.css">
+</head>
+<body>
+
+    <a href="../index.html" class="back-link">← Back to Game Hub</a>
+
+    <div class="header">
+        <h1>💣 Minesweeper</h1>
+        <p>Left-click to reveal · Right-click to flag · Click numbers to chord</p>
+    </div>
+
+    <!-- Difficulty selector -->
+    <div class="difficulty-bar">
+        <button class="diff-btn active" data-diff="easy"   onclick="selectDifficulty('easy')">😊 Easy<br><small>9×9 · 10 mines</small></button>
+        <button class="diff-btn"        data-diff="medium" onclick="selectDifficulty('medium')">😐 Medium<br><small>16×16 · 40 mines</small></button>
+        <button class="diff-btn"        data-diff="hard"   onclick="selectDifficulty('hard')">😰 Hard<br><small>30×16 · 99 mines</small></button>
+    </div>
+
+    <!-- Game container -->
+    <div class="game-container">
+        <!-- HUD -->
+        <div class="hud">
+            <span class="hud-display" id="mine-count">010</span>
+            <button id="face-btn" title="New game" onclick="newGame()">😊</button>
+            <span class="hud-display" id="timer">000</span>
+        </div>
+
+        <!-- Board -->
+        <div id="board"></div>
+    </div>
+
+    <!-- Win / Loss overlay -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-card">
+            <h2 id="overlay-title"></h2>
+            <p  id="overlay-msg"></p>
+            <button class="play-again-btn" onclick="newGame()">Play Again</button>
+            <button class="play-again-btn secondary" onclick="hideOverlay()">View Board</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="gameLogic/game-state.js"></script>
+    <script src="gameLogic/game-logic.js"></script>
+    <script>
+        function selectDifficulty(diff) {
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-diff="${diff}"]`).classList.add('active');
+            currentDifficulty = diff;
+            initGame(diff);
+        }
+
+        function newGame() {
+            initGame(currentDifficulty);
+        }
+
+        // Prevent context menu on the board
+        document.addEventListener('contextmenu', e => {
+            if (e.target.classList.contains('cell')) e.preventDefault();
+        });
+
+        // Kick off with easy mode
+        initGame('easy');
+    </script>
+</body>
+</html>
