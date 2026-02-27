@@ -283,14 +283,24 @@ function mp_loadMpQuestion() {
 // Called when the local timer hits 0 in multiplayer
 // ─────────────────────────────────────────────────────────────────────────────
 function mp_onTimeUp() {
+    const feedback  = document.getElementById('feedback');
+    const input     = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Always disable input when time is up
+    input.disabled     = true;
+    submitBtn.disabled = true;
+
+    // Only overwrite feedback if the local player didn't already answer correctly
+    if (!mp_myAnsweredThisRound) {
+        feedback.textContent = '⏰ Time\'s up! Answer: ' + currentQuestionData.answer;
+        feedback.className   = 'feedback wrong';
+    }
+
     if (mp_isHost) {
         mp_advanceQuestion();
     } else {
-        // Clients just wait for host to send next-question
-        document.getElementById('answer-input').disabled = true;
-        document.getElementById('submit-btn').disabled   = true;
-        document.getElementById('feedback').textContent  = '⏰ Time\'s up! Waiting for host…';
-        document.getElementById('feedback').className    = 'feedback wrong';
+        // Clients wait for host to send next-question
     }
 }
 

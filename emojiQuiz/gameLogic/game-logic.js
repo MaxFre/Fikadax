@@ -176,10 +176,7 @@ function submitAnswer() {
     const isCorrect = checkAnswer(userAnswer, correctAnswer);
     
     if (isCorrect) {
-        // Stop the timer
-        stopTimer();
-
-        // Disable input
+        // Disable input immediately so the player can't re-submit
         answerInput.disabled = true;
         document.getElementById('submit-btn').disabled = true;
         document.getElementById('skip-btn').disabled = true;
@@ -191,9 +188,13 @@ function submitAnswer() {
             feedback.className = 'feedback correct';
             showMessage(`🎉 +${points} pts!`, 'success');
             mp_onCorrectAnswer(points);
-            // Host will send next-question; just wait
+            // Do NOT stop the timer here — host needs it to auto-advance
+            // when not all players have answered yet.
             return;
         }
+
+        // Singleplayer: stop the timer now
+        stopTimer();
         
         questionsAnswered++;
         score++;
