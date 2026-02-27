@@ -7,10 +7,10 @@ let bestStreak = 0;
 let usedQuestions = [];
 
 // Timer state
-let timeRemaining = 20;
+let timeRemaining = 60;
 let timerInterval = null;
-const TOTAL_TIME = 20;
-const HINT_START_TIME = 5; // Start showing hints at 5 seconds remaining
+const TOTAL_TIME = 60;
+const HINT_START_TIME = 15; // Start showing hints at 15 seconds remaining
 
 // Quiz data - Movies and TV Series with emoji clues
 const quizData = [
