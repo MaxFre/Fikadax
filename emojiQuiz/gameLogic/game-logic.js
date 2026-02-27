@@ -1,6 +1,9 @@
 // Current question data
 let currentQuestionData = null;
 
+// Multiplayer flag (set by mp-game.js)
+let isMultiplayer = false;
+
 // Stop timer
 function stopTimer() {
     if (timerInterval) {
@@ -86,6 +89,11 @@ function updateHintDisplay() {
 
 // Handle time up
 function handleTimeUp() {
+    if (isMultiplayer) {
+        mp_onTimeUp();
+        return;
+    }
+
     const feedback = document.getElementById('feedback');
     const answerInput = document.getElementById('answer-input');
     
@@ -117,21 +125,10 @@ function initGame() {
     updateStatsDisplay();
     loadNewQuestion();
     
-    // Setup event listeners
-    document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-    document.getElementById('skip-btn').addEventListener('click', skipQuestion);
-    document.getElementById('answer-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            submitAnswer();
-        }
-    });
-    
-    document.getElementById('back-to-home-btn').addEventListener('click', () => {
-        window.location.href = '../index.html';
-    });
-    
-    // Focus on input
-    document.getElementById('answer-input').focus();
+    // Enter key submits answer
+    const input = document.getElementById('answer-input');
+    input.onkeypress = (e) => { if (e.key === 'Enter') submitAnswer(); };
+    input.focus();
 }
 
 // Load new question
@@ -181,6 +178,22 @@ function submitAnswer() {
     if (isCorrect) {
         // Stop the timer
         stopTimer();
+
+        // Disable input
+        answerInput.disabled = true;
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('skip-btn').disabled = true;
+
+        if (isMultiplayer) {
+            // Points based on remaining time (max 600, min 10)
+            const points = Math.max(10, timeRemaining * 10);
+            feedback.textContent = `✅ Correct! +${points} pts`;
+            feedback.className = 'feedback correct';
+            showMessage(`🎉 +${points} pts!`, 'success');
+            mp_onCorrectAnswer(points);
+            // Host will send next-question; just wait
+            return;
+        }
         
         questionsAnswered++;
         score++;
@@ -201,11 +214,6 @@ function submitAnswer() {
         saveStats();
         updateStatsDisplay();
         
-        // Disable input temporarily
-        answerInput.disabled = true;
-        document.getElementById('submit-btn').disabled = true;
-        document.getElementById('skip-btn').disabled = true;
-        
         // Load next question after delay
         setTimeout(() => {
             loadNewQuestion();
@@ -215,8 +223,12 @@ function submitAnswer() {
         feedback.textContent = '❌ Try again!';
         feedback.className = 'feedback wrong';
         answerInput.value = '';
+        // Shake + flash the input red
+        answerInput.classList.remove('wrong-shake');
+        void answerInput.offsetWidth; // force reflow so animation restarts
+        answerInput.classList.add('wrong-shake');
+        answerInput.addEventListener('animationend', () => answerInput.classList.remove('wrong-shake'), { once: true });
         answerInput.focus();
-        showMessage('Keep guessing!', 'error');
     }
 }
 
@@ -257,6 +269,11 @@ function cleanAnswerForComparison(answer) {
 
 // Skip question
 function skipQuestion() {
+    if (isMultiplayer) {
+        mp_hostSkip();
+        return;
+    }
+
     stopTimer();
     
     const feedback = document.getElementById('feedback');

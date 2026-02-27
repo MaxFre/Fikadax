@@ -7,67 +7,185 @@
     <link rel="stylesheet" href="visuals/styles.css">
 </head>
 <body>
+
     <div class="header">
         <h1>🎬 Emoji Quiz 🎭</h1>
         <p>Guess the movie or series from the emojis!</p>
     </div>
 
-    <div class="stats-container">
-        <div class="stat-item">
-            <div class="stat-label">Score</div>
-            <div class="stat-value" id="score">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Answered</div>
-            <div class="stat-value" id="total-answered">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Accuracy</div>
-            <div class="stat-value" id="accuracy">0%</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Streak</div>
-            <div class="stat-value" id="current-streak">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Best</div>
-            <div class="stat-value" id="best-streak">0</div>
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 1 — Mode select
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="screen-mode" class="screen">
+        <div class="mode-card">
+            <button class="btn btn-primary mode-btn" onclick="startSingleplayer()">
+                🎮 Singleplayer
+                <small>Track your score &amp; streaks</small>
+            </button>
+            <button class="btn btn-multiplayer mode-btn" onclick="mp_showScreen('screen-mp-setup'); mp_showSetup('host')">
+                👥 Multiplayer
+                <small>Compete with friends in real-time</small>
+            </button>
+            <a href="../index.html" class="btn btn-secondary mode-btn">🏠 Back to Hub</a>
         </div>
     </div>
 
-    <div class="game-container">
-        <div class="question-container">
-            <div class="type-badge" id="type-label">Film</div>
-            <div class="timer-display" id="timer-display">⏱️ 60</div>
-            <div class="emoji-display" id="emoji-display">🎬🎭🎪</div>
-            <div class="hint-display" id="hint-display"></div>
-        </div>
-
-        <div class="answer-section">
-            <input 
-                type="text" 
-                id="answer-input" 
-                placeholder="Type your answer..."
-                autocomplete="off"
-            >
-            
-            <div class="button-group">
-                <button class="btn btn-primary" id="submit-btn">✓ Submit</button>
-                <button class="btn btn-secondary" id="skip-btn">⏭ Skip</button>
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 2 — Multiplayer setup (host / join tabs)
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="screen-mp-setup" class="screen hidden">
+        <div class="mp-setup-card">
+            <div class="mp-tabs">
+                <button id="host-tab" class="mp-tab active" onclick="mp_showSetup('host')">🏠 Host</button>
+                <button id="join-tab" class="mp-tab" onclick="mp_showSetup('join')">🔗 Join</button>
             </div>
-            
-            <div class="feedback" id="feedback"></div>
+
+            <!-- Host section -->
+            <div id="host-section">
+                <label class="mp-label">Your name</label>
+                <input type="text" id="player-name-host" class="mp-input" placeholder="e.g. Alex" maxlength="20">
+                <button class="btn btn-primary" onclick="mp_hostGame()">Create Room</button>
+            </div>
+
+            <!-- Join section -->
+            <div id="join-section" class="hidden">
+                <label class="mp-label">Your name</label>
+                <input type="text" id="player-name-join" class="mp-input" placeholder="e.g. Alex" maxlength="20">
+                <label class="mp-label">Room code</label>
+                <input type="text" id="room-code-input" class="mp-input mp-code-input" placeholder="ABC123" maxlength="6">
+                <button class="btn btn-primary" onclick="mp_joinGame()">Join Room</button>
+                <div id="mp-setup-status" class="mp-status hidden"></div>
+            </div>
+
+            <button class="btn btn-secondary" style="margin-top:14px" onclick="mp_showScreen('screen-mode')">← Back</button>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="btn btn-secondary" id="back-to-home-btn">🏠 Back to Game Hub</button>
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 3 — Lobby
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="screen-lobby" class="screen hidden">
+        <div class="lobby-card">
+            <h2>🎮 Lobby</h2>
+            <p class="lobby-code-label">Room Code</p>
+            <div class="lobby-code-display" id="lobby-code-display">——</div>
+            <p class="lobby-hint">Share this code with friends!</p>
+
+            <div id="lobby-players" class="lobby-players"></div>
+
+            <div id="lobby-status" class="mp-status hidden"></div>
+
+            <button id="start-game-btn" class="btn btn-primary" style="display:none" onclick="mp_hostStartGame()">
+                ▶ Start Game
+            </button>
+        </div>
     </div>
 
-    <!-- Message -->
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 4 — Game (singleplayer & multiplayer)
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="screen-game" class="screen hidden">
+
+        <!-- Singleplayer stats bar -->
+        <div id="stats-bar" class="stats-container">
+            <div class="stat-item"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+            <div class="stat-item"><div class="stat-label">Answered</div><div class="stat-value" id="total-answered">0</div></div>
+            <div class="stat-item"><div class="stat-label">Accuracy</div><div class="stat-value" id="accuracy">0%</div></div>
+            <div class="stat-item"><div class="stat-label">Streak</div><div class="stat-value" id="current-streak">0</div></div>
+            <div class="stat-item"><div class="stat-label">Best</div><div class="stat-value" id="best-streak">0</div></div>
+        </div>
+
+        <div class="game-layout">
+
+            <!-- Main game card -->
+            <div class="game-container">
+                <!-- Multiplayer progress badge -->
+                <div id="mp-progress" class="mp-progress hidden"></div>
+
+                <div class="question-container">
+                    <div class="type-badge" id="type-label">Film</div>
+                    <div class="timer-display" id="timer-display">⏱️ 60</div>
+                    <div class="emoji-display" id="emoji-display">🎬🎭🎪</div>
+                    <div class="hint-display" id="hint-display"></div>
+                </div>
+
+                <div class="answer-section">
+                    <input type="text" id="answer-input" placeholder="Type your answer…" autocomplete="off"
+                        onkeydown="if(event.key==='Enter') submitAnswer()">
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">✓ Submit</button>
+                        <button class="btn btn-secondary" id="skip-btn" onclick="skipQuestion()">⏭ Skip</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </div>
+
+            <!-- Multiplayer scoreboard sidebar -->
+            <div id="mp-sidebar" class="mp-sidebar hidden">
+                <h3>🏆 Scores</h3>
+                <div id="mp-scoreboard" class="mp-scoreboard"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="back-to-home-btn">🏠 Back to Game Hub</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 5 — Results
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="screen-results" class="screen hidden">
+        <div class="results-card">
+            <h2>🏁 Final Scores</h2>
+            <div id="results-list" class="results-list"></div>
+            <button class="btn btn-primary" onclick="location.reload()">Play Again</button>
+            <a href="../index.html" class="btn btn-secondary">🏠 Game Hub</a>
+        </div>
+    </div>
+
+    <!-- Message toast -->
     <div class="message" id="message"></div>
 
+    <!-- Scripts -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script src="gameLogic/game-state.js"></script>
     <script src="gameLogic/game-logic.js"></script>
+    <script src="multiplayer/mp-game.js"></script>
+    <script>
+        // Remove the auto-start wired in game-logic.js
+        window.removeEventListener('load', initGame);
+
+        // Show mode screen on load
+        window.addEventListener('load', () => {
+            mp_showScreen('screen-mode');
+        });
+
+        // Singleplayer entry point
+        function startSingleplayer() {
+            isMultiplayer = false;
+            showSingleplayerStats(true);
+            document.getElementById('skip-btn').style.display = '';
+            document.getElementById('mp-progress').classList.add('hidden');
+            document.getElementById('mp-sidebar').classList.add('hidden');
+            mp_showScreen('screen-game');
+            initGame();
+        }
+
+        // Patch mp_startMultiplayerGame to show sidebar + progress
+        const _origMpStart = mp_startMultiplayerGame;
+        mp_startMultiplayerGame = function() {
+            document.getElementById('mp-sidebar').classList.remove('hidden');
+            document.getElementById('mp-progress').classList.remove('hidden');
+            _origMpStart();
+        };
+
+        // Back to hub
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('back-to-home-btn').addEventListener('click', () => {
+                window.location.href = '../index.html';
+            });
+        });
+    </script>
 </body>
 </html>
